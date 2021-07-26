@@ -21,6 +21,7 @@ typedef struct types
 char* (*get_func(char i))(va_list);
 char *create_buffer(void);
 void write_buffer(char *buffer, int len, va_list list);
+char *_strcpy(char *dest, char *src);
 int _printf(const char *format, ...);
 char *print_s(va_list list);
 char *print_c(va_list list);
