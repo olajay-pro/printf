@@ -25,5 +25,7 @@ char *_strcpy(char *dest, char *src);
 int _printf(const char *format, ...);
 char *print_s(va_list list);
 char *print_c(va_list list);
+char *rot13(va_list list);
+char *rev_string(va_list list);
 
 #endif 
