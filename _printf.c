@@ -1,123 +1,80 @@
 #include "holberton.h"
+#include <stdlib.h>
 
 /**
- *_printf - function that produces output according to a format
- *@format: takes output
- *Return: the number of characters printed
+ * check_for_specifiers - checks if there is a valid format specifier
+ * @format: possible format specifier
+ *
+ * Return: pointer to valid function or NULL
  */
-
-int check_buffer_overflow(char *buffer, int len)
+static int (*check_for_specifiers(const char *format))(va_list)
 {
-	if (len > 1020)
-	{
-		write(1, buffer, len);
-		len = 0;
-	}
-	return (len);
+unsigned int i;
+print_t p[] = {
+{"c", print_c},
+{"s", print_s},
+{"i", print_i},
+{"d", print_d},
+{"u", print_u},
+{"b", print_b},
+{"o", print_o},
+{"x", print_x},
+{"X", print_X},
+{"p", print_p},
+{"S", print_S},
+{"r", print_r},
+{"R", print_R},
+{NULL, NULL}
+};
+for (i = 0; p[i].t != NULL; i++)
+{
+if (*(p[i].t) == *format)
+{
+break;
+}
+}
+return (p[i].f);
 }
 
 /**
- * _printf - mini printf version
- * @format: initial string with all identifiers
- * Return: strings with identifiers expanded
+ * _printf - prints anything
+ * @format: list of argument types passed to the function
+ *
+ * Return: number of characters printed
  */
 int _printf(const char *format, ...)
 {
-	int len = 0, total_len = 0, i = 0, j = 0;
-	va_list list;
-	char *buffer, *str;
-	char* (*f)(va_list);
-
-	if (format == NULL)
-		return (-1);
-
-	buffer = create_buffer();
-	if (buffer == NULL)
-		return (-1);
-
-	va_start(list, format);
-
-	while (format[i] != '\0')
-	{
-		if (format[i] != '%') /* copy format into buffer until '%' */
-		{
-			len = check_buffer_overflow(buffer, len);
-			buffer[len++] = format[i++];
-			total_len++;
-		}
-		else /* if %, find function */
-		{
-			i++;
-			if (format[i] == '\0') /* handle single ending % */
-			{
-				va_end(list);
-				free(buffer);
-				return (-1);
-			}
-			if (format[i] == '%') /* handle double %'s */
-			{
-				len = check_buffer_overflow(buffer, len);
-				buffer[len++] = format[i];
-				total_len++;
-			}
-			else
-			{
-				f = get_func(format[i]); /* grab function */
-				if (f == NULL)  /* handle fake id */
-				{
-					len = check_buffer_overflow(buffer, len);
-					buffer[len++] = '%'; total_len++;
-					buffer[len++] = format[i]; total_len++;
-				}
-				else /* return string, copy to buffer */
-				{
-					str = f(list);
-					if (str == NULL)
-					{
-						va_end(list);
-						free(buffer);
-						return (-1);
-					}
-					if (format[i] == 'c' && str[0] == '\0')
-					{
-						len = check_buffer_overflow(buffer, len);
-						buffer[len++] = '\0';
-						total_len++;
-					}
-					j = 0;
-					while (str[j] != '\0')
-					{
-						len = check_buffer_overflow(buffer, len);
-						buffer[len++] = str[j];
-						total_len++; j++;
-					}
-					free(str);
-				}
-			} i++;
-		}
-	}
-	write_buffer(buffer, len, list);
-	return (total_len);
-}
-
-/**
- * main - sample main program
- * Return: 0 on sucess
- */
-int main(void)
+unsigned int i = 0, count = 0;
+va_list valist;
+int (*f)(va_list);
+if (format == NULL)
+return (-1);
+va_start(valist, format);
+while (format[i])
 {
-	_printf("\n\n\nHere's some examples of what you could do with this custom_printf function!\n\n\n");
-	sleep(1);
-	_printf("\nPrinting Strings, Characters, and Numbers...... %s %c%drld\n\n", "Hello", 'W', 0);
-	sleep(1);
-	_printf("Printing Reverse...... %r \n\n", "Hello");
-	sleep(1);
-	_printf("Printing Binary (base 2)...... %b \n\n", "Hello");
-	sleep(1);
-	_printf("Printing Octal (base 8)...... %o \n\n", "Hello");
-	sleep(1);
-	_printf("Printing Rot13 (encrypt)...... %R \n\n", "Hello");
-	sleep(1);
-	_printf("\n\n             = )                  \n\n\n");
-	return (0);
+for (; format[i] != '%' && format[i]; i++)
+{
+_putchar(format[i]);
+count++;
+}
+if (!format[i])
+return (count);
+f = check_for_specifiers(&format[i + 1]);
+if (f != NULL)
+{
+count += f(valist);
+i += 2;
+continue;
+}
+if (!format[i + 1])
+return (-1);
+_putchar(format[i]);
+count++;
+if (format[i + 1] == '%')
+i += 2;
+else
+i++;
+}
+va_end(valist);
+return (count);
 }
