@@ -1,6 +1,7 @@
 #include "holberton.h"
 #include <stdlib.h>
 
+
 /**
  * check_for_specifiers - checks if there is a valid format specifier
  * @format: possible format specifier
@@ -26,6 +27,7 @@ print_t p[] = {
 {"R", print_R},
 {NULL, NULL}
 };
+
 for (i = 0; p[i].t != NULL; i++)
 {
 if (*(p[i].t) == *format)
@@ -34,6 +36,7 @@ break;
 }
 }
 return (p[i].f);
+
 }
 
 /**
@@ -47,8 +50,10 @@ int _printf(const char *format, ...)
 unsigned int i = 0, count = 0;
 va_list valist;
 int (*f)(va_list);
+
 if (format == NULL)
 return (-1);
+
 va_start(valist, format);
 while (format[i])
 {
